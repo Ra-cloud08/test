@@ -1,17 +1,17 @@
 #include<iostream>
 #include<string.h>
-// int main1(){
+int main1(){
 
-//     int a, b;
-//     std::cout<<"Enter number a: ";
-//     std::cin>>a;
-//     std::cout<<"Enter number b: ";
-//     std::cin>>b;
-//     int sum = a+b;
-//     std::cout<<"The result is: "<<sum<<std::endl;
-//     return 0;
+    int a, b;
+    std::cout<<"Enter number a: ";
+    std::cin>>a;
+    std::cout<<"Enter number b: ";
+    std::cin>>b;
+    int sum = a+b;
+    std::cout<<"The result is: "<<sum<<std::endl;
+    return 0;
 
-// }
+}
 int main(){
     char myarray[30], myarray1[30];
     char myarray2[30], myarray3[30];
