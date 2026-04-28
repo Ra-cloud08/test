@@ -7,7 +7,7 @@
 #include<iostream>
 
 int main(){
-    
+
     std::cout<<std::endl;
     std::cout<<"======= Welcome ======"<<std::endl;
     float Coffe , Juice;
@@ -44,7 +44,7 @@ int main(){
     std::cout<<std::endl;
 
     //split money between two worker
-    std::cout<<"======= Split money between 2 worker ======="<<std::endl;
+    std::cout<<"======= Distribute money between 2 worker ======="<<std::endl;
     float moneyperworker = totalprice / 2;
     std::cout<<"Once worker recieve: "<<moneyperworker<<"$"<<std::endl;
     std::cout<<std::endl;
