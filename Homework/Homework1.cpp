@@ -52,11 +52,11 @@ int main(){
     //stock report
     std::cout<<"======= Stock report ======="<<std::endl;
     int coffestock = 10, juicestock = 10;
-        if(Coffe<=10){
-        coffestock-=Coffe;
+        if(Coffe <= 10){
+        coffestock -= Coffe;
         }
-        if(Juice<=10){
-        juicestock-=Juice;
+        if(Juice <= 10){
+        juicestock -= Juice;
         }
     std::cout<<"Remaining coffe stock: "<<coffestock<<" glasses"<<std::endl;
     std::cout<<"Remaining juice stock: "<<juicestock<<" glasses"<<std::endl;
@@ -64,7 +64,7 @@ int main(){
 
     //stock update
     std::cout<<"======= stock update ======="<<std::endl;
-    coffestock+=Coffe, juicestock+=Juice;
+    coffestock += Coffe, juicestock += Juice;
     std::cout<<"Update coffe stock: "<<coffestock<<" glasses"<<std::endl;
     std::cout<<"Update juice stock: "<<juicestock<<" glasses"<<std::endl;
     std::cout<<std::endl;
