@@ -9,10 +9,11 @@
 
 int main(){
 
-    std::cout<<std::endl;
-    std::cout<<"======= Welcome ======"<<std::endl;
+    
     float Coffe , Juice, Matcha;
     //costumer oder
+    std::cout<<std::endl;
+    std::cout<<"======= Welcome ======"<<std::endl;
     std::cout<<"The costumer buy coffe: ";
     std::cin>>Coffe;
     std::cout<<"The costumehr buy juice: ";
