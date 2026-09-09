@@ -107,27 +107,4 @@
     
 //     return 0;
 // }
-#include<iostream>
-using namespace std;
-    struct Drinkprice{
-        int matcha;
-        float juice;
-        int coffe ;
-    
-};
 
-int main(){
-    
-    Drinkprice p1;
-    p1.matcha = 3;
-    p1.juice = 3.35;
-    p1.coffe = 2.5;
-    
-    
-    Drinkprice p2 ={.matcha = 3, .juice= 3.4, .coffe=5};
-    cout<<p2.matcha<<endl;
-    cout<<p2.juice<<endl;
-    cout<<p2.coffe<<endl;
-    
-    return 0;
-}

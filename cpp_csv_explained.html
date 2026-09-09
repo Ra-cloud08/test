@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Explained — Reading Calories.csv in C++</title>
+<style>
+  :root{
+    --bg: #0f1420;
+    --panel: #161d2e;
+    --panel-2: #1c2438;
+    --border: #262f45;
+    --text: #e7ebf5;
+    --text-dim: #8b95ac;
+    --accent: #5eead4;
+    --accent-2: #7c9aff;
+    --warn: #ffb454;
+    --code-bg: #0b0f1a;
+    --code-string: #ffd479;
+    --code-type: #7c9aff;
+    --code-comment: #6b7690;
+    --code-func: #5eead4;
+    --code-num: #ff8fa3;
+    --radius: 10px;
+    --sidebar-w: 260px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width: var(--sidebar-w);
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top:0; left:0; bottom:0;
+    padding: 24px 0;
+    overflow-y:auto;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 0 20px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .brand-icon{
+    width:34px; height:34px;
+    border-radius:8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:#0b0f1a; font-size:15px;
+  }
+  .brand-text{ line-height:1.2; }
+  .brand-text strong{ display:block; font-size:14px; }
+  .brand-text span{ display:block; font-size:11px; color:var(--text-dim); }
+
+  .nav-section-label{
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    padding: 14px 20px 6px 20px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 10px 20px;
+    color: var(--text-dim);
+    text-decoration:none;
+    font-size: 14px;
+    border-left: 3px solid transparent;
+    cursor:pointer;
+  }
+  .nav-item:hover{ color: var(--text); background: var(--panel-2); }
+  .nav-item.active{
+    color: var(--accent);
+    background: var(--panel-2);
+    border-left-color: var(--accent);
+  }
+  .nav-dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--text-dim);
+    flex-shrink:0;
+  }
+  .nav-item.active .nav-dot{ background: var(--accent); }
+
+  /* ---------- MAIN ---------- */
+  .main{
+    margin-left: var(--sidebar-w);
+    flex:1;
+    padding: 28px 40px 80px 40px;
+    max-width: 980px;
+  }
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar h1{
+    font-size: 22px;
+    margin:0 0 4px 0;
+  }
+  .topbar p{
+    margin:0;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+  .badge{
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 22px;
+  }
+  .card h2{
+    font-size: 17px;
+    margin: 0 0 6px 0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .step-num{
+    background: var(--accent);
+    color: #0b0f1a;
+    width:26px; height:26px;
+    border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700;
+    flex-shrink:0;
+  }
+  .card .lede{
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin: 0 0 16px 0;
+    line-height:1.5;
+  }
+
+  pre{
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x:auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 14px 0;
+  }
+  code{ font-family: inherit; }
+  .tok-type{ color: var(--code-type); }
+  .tok-str{ color: var(--code-string); }
+  .tok-com{ color: var(--code-comment); font-style: italic; }
+  .tok-func{ color: var(--code-func); }
+  .tok-num{ color: var(--code-num); }
+  .tok-kw{ color: #ff8fa3; }
+
+  .explain-list{
+    margin:0; padding:0; list-style:none;
+  }
+  .explain-list li{
+    display:flex;
+    gap:12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    line-height:1.6;
+  }
+  .explain-list li:first-child{ border-top:none; }
+  .explain-tag{
+    flex-shrink:0;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--accent-2);
+    font-family: 'Consolas', monospace;
+    font-size: 12.5px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    height: fit-content;
+    white-space:nowrap;
+  }
+
+  .note{
+    display:flex;
+    gap:12px;
+    background: rgba(255, 180, 84, 0.08);
+    border: 1px solid rgba(255, 180, 84, 0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    line-height:1.6;
+    color: var(--text);
+  }
+  .note b{ color: var(--warn); }
+
+  .flow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top: 4px;
+  }
+  .flow-step{
+    background: var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:13px;
+    flex:1;
+    min-width:160px;
+  }
+  .flow-step b{ display:block; color:var(--accent); font-size:12px; margin-bottom:4px; }
+  .flow-arrow{ align-self:center; color:var(--text-dim); }
+
+  .table-demo{
+    width:100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .table-demo th, .table-demo td{
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align:left;
+  }
+  .table-demo th{
+    background: var(--panel-2);
+    color: var(--accent);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .table-demo td{ color: var(--text-dim); font-family: 'Consolas', monospace; }
+
+  footer{
+    margin-left: var(--sidebar-w);
+    padding: 20px 40px 40px 40px;
+    color: var(--text-dim);
+    font-size: 12.5px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 800px){
+    .sidebar{ display:none; }
+    .main, footer{ margin-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<nav class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-icon">{ }</div>
+    <div class="brand-text">
+      <strong>Code Explainer</strong>
+      <span>C++ · CSV Reader</span>
+    </div>
+  </div>
+
+  <div class="nav-section-label">Overview</div>
+  <a class="nav-item" data-target="overview"><span class="nav-dot"></span> What this program does</a>
+  <a class="nav-item" data-target="bigpicture"><span class="nav-dot"></span> Big picture flow</a>
+
+  <div class="nav-section-label">Line by Line</div>
+  <a class="nav-item" data-target="includes"><span class="nav-dot"></span> 1. Includes</a>
+  <a class="nav-item" data-target="setup"><span class="nav-dot"></span> 2. Setup & variables</a>
+  <a class="nav-item" data-target="openfile"><span class="nav-dot"></span> 3. Opening the file</a>
+  <a class="nav-item" data-target="readloop"><span class="nav-dot"></span> 4. Reading each line</a>
+  <a class="nav-item" data-target="splitloop"><span class="nav-dot"></span> 5. Splitting by comma</a>
+  <a class="nav-item" data-target="printloop"><span class="nav-dot"></span> 6. Printing the result</a>
+
+  <div class="nav-section-label">Reference</div>
+  <a class="nav-item" data-target="glossary"><span class="nav-dot"></span> Beginner glossary</a>
+  <a class="nav-item" data-target="pitfalls"><span class="nav-dot"></span> Common pitfalls</a>
+</nav>
+
+<!-- ================= MAIN CONTENT ================= -->
+<main class="main">
+
+  <div class="topbar">
+    <div>
+      <h1>Reading Calories.csv with C++</h1>
+      <p>A beginner-friendly breakdown of every line in the program</p>
+    </div>
+    <div class="badge">C++ · File I/O</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="card" id="overview">
+    <h2><span class="step-num">i</span> What this program does</h2>
+    <p class="lede">
+      In one sentence: it opens a CSV file called <code>Calories.csv</code>, reads up to 170 rows
+      with 5 columns each, splits every line on the comma character, stores everything as text,
+      and then prints it all back out to the screen in a neat tab-separated table.
+    </p>
+    <div class="note">
+      <span>📌</span>
+      <span><b>CSV</b> stands for "Comma-Separated Values" — it's a plain text file where each line
+      is one row of data, and commas separate the columns. Think of it like a simple spreadsheet
+      saved as plain text.</span>
+    </div>
+  </section>
+
+  <!-- BIG PICTURE -->
+  <section class="card" id="bigpicture">
+    <h2><span class="step-num">ii</span> Big picture flow</h2>
+    <p class="lede">Before diving into each line, here's the overall journey the data takes:</p>
+    <div class="flow">
+      <div class="flow-step"><b>Step 1</b>Open Calories.csv from disk</div>
+      <div class="flow-step"><b>Step 2</b>Read one full line of text</div>
+      <div class="flow-step"><b>Step 3</b>Split that line into 5 pieces by comma</div>
+      <div class="flow-step"><b>Step 4</b>Store the 5 pieces in the array</div>
+      <div class="flow-step"><b>Step 5</b>Repeat for up to 170 lines</div>
+      <div class="flow-step"><b>Step 6</b>Print everything to the console</div>
+    </div>
+  </section>
+
+  <!-- 1. INCLUDES -->
+  <section class="card" id="includes">
+    <h2><span class="step-num">1</span> Includes — the toolboxes we bring in</h2>
+    <p class="lede">Every C++ program starts by "including" libraries — pre-written code that gives us useful tools.</p>
+<pre><span class="tok-kw">#include</span> <span class="tok-str">&lt;fstream&gt;</span>
+<span class="tok-kw">#include</span> <span class="tok-str">&lt;iostream&gt;</span>
+<span class="tok-kw">#include</span> <span class="tok-str">&lt;sstream&gt;</span>
+<span class="tok-kw">#include</span> <span class="tok-str">&lt;string&gt;</span></pre>
+    <ul class="explain-list">
+      <li><span class="explain-tag">&lt;fstream&gt;</span> Lets us open and read files from disk (short for "file stream"). This gives us <code>std::ifstream</code>, used to read <code>Calories.csv</code>.</li>
+      <li><span class="explain-tag">&lt;iostream&gt;</span> Lets us print things to the screen, using <code>std::cout</code>.</li>
+      <li><span class="explain-tag">&lt;sstream&gt;</span> Lets us treat a single line of text like a mini "file" we can read piece by piece — this is how we split by comma.</li>
+      <li><span class="explain-tag">&lt;string&gt;</span> Gives us the <code>std::string</code> type, for working with text.</li>
+    </ul>
+  </section>
+
+  <!-- 2. SETUP -->
+  <section class="card" id="setup">
+    <h2><span class="step-num">2</span> Setup & variables</h2>
+<pre><span class="tok-kw">const</span> <span class="tok-type">int</span> ROWS = <span class="tok-num">170</span>, COLS = <span class="tok-num">5</span>;
+<span class="tok-type">std::string</span> data[ROWS][COLS], line;
+<span class="tok-type">std::ifstream</span> file(<span class="tok-str">"../Calories.csv"</span>);
+<span class="tok-type">int</span> row = <span class="tok-num">0</span>;</pre>
+    <ul class="explain-list">
+      <li><span class="explain-tag">ROWS, COLS</span> Two fixed numbers: the CSV has 170 rows and 5 columns. Declaring them as <code>const int</code> means "these never change while the program runs."</li>
+      <li><span class="explain-tag">data[ROWS][COLS]</span> A 2D array (a grid) of text — imagine a spreadsheet with 170 rows and 5 columns, where every cell holds a piece of text.</li>
+      <li><span class="explain-tag">line</span> A single empty string, used as a temporary holder for one line of the file at a time.</li>
+      <li><span class="explain-tag">file</span> Opens the file located one folder up (<code>../</code>) named <code>Calories.csv</code>, so we can read from it.</li>
+      <li><span class="explain-tag">row</span> A counter starting at 0, tracking which row of the array we're currently filling in.</li>
+    </ul>
+    <div class="note">
+      <span>⚠️</span>
+      <span><b>Fixed-size arrays</b> like <code>data[170][5]</code> only work if you know the exact size in advance.
+      If the real CSV has more or fewer rows, this would need adjusting (see "Common pitfalls" below).</span>
+    </div>
+  </section>
+
+  <!-- 3. OPENING FILE -->
+  <section class="card" id="openfile">
+    <h2><span class="step-num">3</span> Opening the file (recap)</h2>
+    <p class="lede">
+      The line <code>std::ifstream file("../Calories.csv");</code> does the actual work of opening the file.
+      <code>ifstream</code> means "input file stream" — a channel for reading data <em>in</em> from a file.
+      If the file doesn't exist or can't be found, <code>file</code> quietly fails, and the loop below simply won't read any lines.
+    </p>
+  </section>
+
+  <!-- 4. READ LOOP -->
+  <section class="card" id="readloop">
+    <h2><span class="step-num">4</span> Reading each line</h2>
+<pre><span class="tok-kw">while</span> (row &lt; ROWS &amp;&amp; <span class="tok-func">std::getline</span>(file, line)) {
+    ...
+    row++;
+}</pre>
+    <ul class="explain-list">
+      <li><span class="explain-tag">std::getline(file, line)</span> Reads one full line of text from the file and stores it in <code>line</code>. It returns <code>false</code> once there's nothing left to read (end of file).</li>
+      <li><span class="explain-tag">row &lt; ROWS</span> A safety check: stop once we've filled all 170 rows, even if the file has more lines.</li>
+      <li><span class="explain-tag">&amp;&amp; (AND)</span> Both conditions must be true to keep looping: there must be rows left <em>and</em> a line must be successfully read.</li>
+      <li><span class="explain-tag">row++</span> After processing a line, increase the row counter by 1 to move to the next slot in the array.</li>
+    </ul>
+  </section>
+
+  <!-- 5. SPLIT LOOP -->
+  <section class="card" id="splitloop">
+    <h2><span class="step-num">5</span> Splitting each line by comma</h2>
+<pre><span class="tok-type">std::stringstream</span> stream(line);
+<span class="tok-kw">for</span> (<span class="tok-type">int</span> col = <span class="tok-num">0</span>; col &lt; COLS; col++) {
+    <span class="tok-func">std::getline</span>(stream, data[row][col], <span class="tok-str">','</span>);
+}</pre>
+    <ul class="explain-list">
+      <li><span class="explain-tag">std::stringstream stream(line)</span> Wraps the single line of text so it can be read piece by piece, just like reading a tiny file — this is the key trick for splitting text.</li>
+      <li><span class="explain-tag">getline(stream, data[row][col], ',')</span> Reads from <code>stream</code> up until the next comma (instead of the usual "until end of line"), and stores that chunk directly into the array.</li>
+      <li><span class="explain-tag">for (col = 0; col &lt; COLS)</span> Repeats this 5 times — once per column — since we know each row has exactly 5 comma-separated values.</li>
+    </ul>
+    <div class="note">
+      <span>💡</span>
+      <span>Think of <code>getline(stream, ..., ',')</code> as "read text until you hit a comma, then stop there."
+      Each call picks up right where the last one left off inside the same line.</span>
+    </div>
+  </section>
+
+  <!-- 6. PRINT LOOP -->
+  <section class="card" id="printloop">
+    <h2><span class="step-num">6</span> Printing the result</h2>
+<pre><span class="tok-kw">for</span> (<span class="tok-type">int</span> i = <span class="tok-num">0</span>; i &lt; row; i++) {
+    <span class="tok-kw">for</span> (<span class="tok-type">int</span> j = <span class="tok-num">0</span>; j &lt; COLS; j++) {
+        std::cout &lt;&lt; data[i][j] &lt;&lt; <span class="tok-str">"\t"</span>;
+    }
+    std::cout &lt;&lt; <span class="tok-str">'\n'</span>;
+}</pre>
+    <ul class="explain-list">
+      <li><span class="explain-tag">i &lt; row</span> Only loops through the rows that were <em>actually</em> filled in — not all 170, in case the file had fewer lines.</li>
+      <li><span class="explain-tag">std::cout &lt;&lt; data[i][j] &lt;&lt; "\t"</span> Prints each cell's text, followed by a tab character, so columns line up neatly.</li>
+      <li><span class="explain-tag">std::cout &lt;&lt; '\n'</span> After printing all 5 columns of a row, moves to a new line before starting the next row.</li>
+    </ul>
+    <p class="lede" style="margin-top:14px;">Example of what the output might look like, based on a typical calories dataset:</p>
+    <table class="table-demo">
+      <tr><th>User_ID</th><th>Gender</th><th>Age</th><th>Height</th><th>Weight</th></tr>
+      <tr><td>14733363</td><td>male</td><td>68</td><td>190</td><td>94</td></tr>
+      <tr><td>14861698</td><td>female</td><td>20</td><td>166</td><td>60</td></tr>
+    </table>
+  </section>
+
+  <!-- GLOSSARY -->
+  <section class="card" id="glossary">
+    <h2><span class="step-num">?</span> Beginner glossary</h2>
+    <ul class="explain-list">
+      <li><span class="explain-tag">std::</span> A "namespace" prefix meaning "this comes from the standard C++ library." It just avoids naming clashes.</li>
+      <li><span class="explain-tag">string</span> A piece of text, like <code>"hello"</code> or <code>"14733363"</code> — even numbers are stored as text here.</li>
+      <li><span class="explain-tag">array data[170][5]</span> A grid with 170 rows and 5 columns, like a mini spreadsheet living in memory.</li>
+      <li><span class="explain-tag">loop (for / while)</span> A block of code that repeats automatically, instead of writing the same instruction 170 times by hand.</li>
+      <li><span class="explain-tag">stream</span> A flowing source of data you can read piece by piece — a file stream reads from disk, a string stream reads from text already in memory.</li>
+    </ul>
+  </section>
+
+  <!-- PITFALLS -->
+  <section class="card" id="pitfalls">
+    <h2><span class="step-num">!</span> Common pitfalls to watch for</h2>
+    <ul class="explain-list">
+      <li><span class="explain-tag">File path</span> <code>"../Calories.csv"</code> means "look one folder above where the program runs." If the .exe runs from a different folder, the file won't be found.</li>
+      <li><span class="explain-tag">Everything is text</span> Numbers like Age or Weight are stored as <code>std::string</code>, not actual numbers — so no math can be done on them without converting first (e.g. with <code>std::stoi</code> or <code>std::stod</code>).</li>
+      <li><span class="explain-tag">Fixed size</span> If the CSV ever has more than 170 rows or a different number of columns, this code needs its <code>ROWS</code>/<code>COLS</code> constants updated, or it should switch to a resizable <code>std::vector</code>.</li>
+      <li><span class="explain-tag">No error message</span> If the file fails to open, the program doesn't tell you — it just silently prints nothing. Adding a check like <code>if (!file) { ... }</code> would help beginners debug this.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  Generated explainer for a C++ CSV-reading program · Built for beginners learning file I/O, arrays, and string streams.
+</footer>
+
+<script>
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.card');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const target = document.getElementById(item.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(item => {
+          item.classList.toggle('active', item.dataset.target === id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(sec => observer.observe(sec));
+</script>
+
+</body>
+</html>
